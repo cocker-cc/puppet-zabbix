@@ -489,6 +489,7 @@ class zabbix::proxy (
   }
 
   # Configuring the zabbix-proxy configuration file
+  $content = template('zabbix/zabbix_proxy.conf.erb')
   file { $proxy_configfile_path:
     ensure  => file,
     owner   => 'zabbix',
@@ -496,7 +497,11 @@ class zabbix::proxy (
     mode    => '0644',
     require => Package["zabbix-proxy-${db}"],
     replace => true,
-    content => template('zabbix/zabbix_proxy.conf.erb'),
+    content => if $database_password =~ Sensitive {
+      Sensitive($content)
+    } else {
+      $content
+    },
   }
 
   # Include dir for specific zabbix-proxy checks.

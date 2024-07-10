@@ -259,6 +259,7 @@ class zabbix::web (
   }
 
   # Webinterface config file
+  $content = template('zabbix/web/zabbix.conf.php.erb')
   file { '/etc/zabbix/web/zabbix.conf.php':
     ensure  => file,
     owner   => $web_config_owner,
@@ -266,9 +267,9 @@ class zabbix::web (
     mode    => '0640',
     replace => true,
     content => if $database_password =~ Sensitive {
-      Sensitive(template('zabbix/web/zabbix.conf.php.erb'))
+      Sensitive($content)
     } else {
-      template('zabbix/web/zabbix.conf.php.erb')
+      $content
     },
   }
 
